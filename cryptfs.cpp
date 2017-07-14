@@ -318,7 +318,8 @@ static int keymaster_sign_object(struct crypt_mnt_ftr *ftr,
             return -1;
     }
     return keymaster_sign_object_for_cryptfs_scrypt(ftr->keymaster_blob, ftr->keymaster_blob_size,
-            KEYMASTER_CRYPTFS_RATE_LIMIT, to_sign, to_sign_size, signature, signature_size);
+            KEYMASTER_CRYPTFS_RATE_LIMIT, to_sign, to_sign_size, signature, signature_size,
+            ftr->keymaster_blob, KEYMASTER_BLOB_SIZE, &ftr->keymaster_blob_size);
 }
 
 /* Store password when userdata is successfully decrypted and mounted.
@@ -2651,9 +2652,7 @@ int cryptfs_enable_internal(char *howarg, int crypt_type, const char *passwd,
 
         /* restart the framework. */
         /* Create necessary paths on /data */
-        if (prep_data_fs()) {
-            goto error_shutting_down;
-        }
+        prep_data_fs();
 
         /* Ugh, shutting down the framework is not synchronous, so until it
          * can be fixed, this horrible hack will wait a moment for it all to
